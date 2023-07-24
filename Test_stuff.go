@@ -1,3 +1,5 @@
+//The main goal of this task: I need to make HTTP server with 2 end-points POST and GET.Server should display blog. Each record contains Name, Header, Text and Time
+//Get should return json records in blog, Post - you can post new blog. Test it via CURL.
 package main
 
 import (
@@ -8,14 +10,17 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"time"
 )
 
 const keyServerAddr = "serverAddr"
 
+//There is every needed components to our blog.
 type Blog struct {
-	Title   string `json:"name"`
-	Content string `json:"content"`
-	Age     string `json:"age"`
+	Name      string    `json:"name"`
+	Header    string    `json:"header"`
+	Content   string    `content`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 var blogRecords []Blog
