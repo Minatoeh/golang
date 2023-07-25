@@ -19,7 +19,7 @@ const keyServerAddr = "serverAddr"
 type Blog struct {
 	Name      string    `json:"name"`
 	Header    string    `json:"header"`
-	Content   string    `content`
+	Content   string    `json:"content"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
@@ -34,7 +34,7 @@ func getRoot(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	fmt.Printf("%s: got / request\n", ctx.Value(keyServerAddr))
 
-	io.WriteString(w, "Welcome page: Hello, this is my first try to do something in Golang! I hope you enjoy it, Artem\n")
+	io.WriteString(w, "Welcome page: Hello, this is my first try to do something in Golang! I hope everything looks fine here.\n")
 }
 
 // Added Method check for correct request.(If it's not post request , it's should return mistake to client.)
@@ -60,8 +60,8 @@ func getBlogs(w http.ResponseWriter, r *http.Request) {
 }
 
 func postBlog(w http.ResponseWriter, r *http.Request) {
-
-	if r.Method != http.MethodGet {
+	//Check if the method is POST.
+	if r.Method != http.MethodPost {
 		http.Error(w, "This is not allowed", http.StatusMethodNotAllowed)
 		return
 	}
