@@ -22,8 +22,9 @@ type Blog struct {
 	Content   string    `content`
 	CreatedAt time.Time `json:"createdAt"`
 }
-
+//Added mu sync.Mutex to syncronithation in real-time to avoide concurency.
 var blogRecords []Blog
+	mu          sync.Mutex
 
 func getRoot(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
