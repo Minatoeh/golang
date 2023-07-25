@@ -1,5 +1,5 @@
-//The main goal of this task: I need to make HTTP server with 2 end-points POST and GET.Server should display blog. Each record contains Name, Header, Text and Time
-//Get should return json records in blog, Post - you can post new blog. Test it via CURL.
+// The main goal of this task: I need to make HTTP server with 2 end-points POST and GET.Server should display blog. Each record contains Name, Header, Text and Time
+// Get should return json records in blog, Post - you can post new blog. Test it via CURL.
 package main
 
 import (
@@ -15,26 +15,35 @@ import (
 
 const keyServerAddr = "serverAddr"
 
-//There is every needed components to our blog.
+// There is every needed components to our blog.
 type Blog struct {
 	Name      string    `json:"name"`
 	Header    string    `json:"header"`
 	Content   string    `content`
-	CreatedAt time.Time `json:"createdAt"`
+	CreatedAt time.Time `json:"created_at"`
 }
-//Added mu sync.Mutex to syncronithation in real-time to avoide concurency.
+
 var blogRecords []Blog
-	mu          sync.Mutex
 
 func getRoot(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	if r.Method != http.MethodGet {
+		http.Error(w, "This is not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
+	ctx := r.Context()
 	fmt.Printf("%s: got / request\n", ctx.Value(keyServerAddr))
 
 	io.WriteString(w, "Welcome page: Hello, this is my first try to do something in Golang! I hope you enjoy it, Artem\n")
 }
 
+// Added Method check for correct request.(If it's not post request , it's should return mistake to client.)
 func getBlogs(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodGet {
+		http.Error(w, "This is not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	ctx := r.Context()
 
 	fmt.Printf("%s: got /blogs request\n", ctx.Value(keyServerAddr))
@@ -51,6 +60,12 @@ func getBlogs(w http.ResponseWriter, r *http.Request) {
 }
 
 func postBlog(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodGet {
+		http.Error(w, "This is not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	ctx := r.Context()
 
 	fmt.Printf("%s: got /post-blog request\n", ctx.Value(keyServerAddr))
