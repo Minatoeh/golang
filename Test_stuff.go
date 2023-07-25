@@ -1,19 +1,12 @@
-// The main goal of this task: I need to make HTTP server with 2 end-points POST and GET.Server should display blog. Each record contains Name, Header, Text and Time
-// Get should return json records in blog, Post - you can post new blog. Test it via CURL.
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net"
 	"net/http"
 	"os"
 	"time"
 )
-
-const keyServerAddr = "serverAddr"
 
 // There is every needed components to our blog.
 type Blog struct {
@@ -31,27 +24,22 @@ func getRoot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx := r.Context()
-	fmt.Printf("%s: got / request\n", ctx.Value(keyServerAddr))
-
-	io.WriteString(w, "Welcome page: Hello, this is my first try to do something in Golang! I hope everything looks fine here.\n")
+	fmt.Println("Got / request")
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	fmt.Fprintln(w, "Welcome page: Hello, this is my first try to do something in Golang! I hope everything looks fine here.")
 }
 
-// Added Method check for correct request.(If it's not post request , it's should return mistake to client.)
 func getBlogs(w http.ResponseWriter, r *http.Request) {
-
 	if r.Method != http.MethodGet {
 		http.Error(w, "This is not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	ctx := r.Context()
 
-	fmt.Printf("%s: got /blogs request\n", ctx.Value(keyServerAddr))
+	fmt.Println("Got /blogs request")
 
 	jsonData, err := json.Marshal(blogRecords)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "Error: %s", err)
+		http.Error(w, fmt.Sprintf("Error: %s", err), http.StatusInternalServerError)
 		return
 	}
 
@@ -60,28 +48,32 @@ func getBlogs(w http.ResponseWriter, r *http.Request) {
 }
 
 func postBlog(w http.ResponseWriter, r *http.Request) {
-	//Check if the method is POST.
 	if r.Method != http.MethodPost {
 		http.Error(w, "This is not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	ctx := r.Context()
-
-	fmt.Printf("%s: got /post-blog request\n", ctx.Value(keyServerAddr))
+	fmt.Println("Got /post-blog request")
 
 	var newBlog Blog
 	err := json.NewDecoder(r.Body).Decode(&newBlog)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "Error decoding JSON: %s", err)
+		http.Error(w, fmt.Sprintf("Error decoding JSON: %s", err), http.StatusBadRequest)
 		return
 	}
 
+	// Perform validation here
+	if newBlog.Name == "" || newBlog.Header == "" || newBlog.Content == "" {
+		http.Error(w, "Name, Header, and Content fields must not be empty", http.StatusBadRequest)
+		return
+	}
+
+	newBlog.CreatedAt = time.Now()
 	blogRecords = append(blogRecords, newBlog)
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	io.WriteString(w, "You've added a new blog, congrats!\n")
+	json.NewEncoder(w).Encode(map[string]string{"message": "You've added a new blog, congrats!"})
 }
 
 func main() {
@@ -93,15 +85,11 @@ func main() {
 	server := &http.Server{
 		Addr:    ":1234",
 		Handler: mux,
-		BaseContext: func(l net.Listener) context.Context {
-			ctx := context.WithValue(context.Background(), keyServerAddr, l.Addr().String())
-			return ctx
-		},
 	}
 
 	fmt.Printf("Server started at %s\n", server.Addr)
 	if err := server.ListenAndServe(); err != nil {
-		fmt.Printf("error starting server: %s\n", err)
+		fmt.Printf("Error starting server: %s\n", err)
 		os.Exit(1)
 	}
 }
