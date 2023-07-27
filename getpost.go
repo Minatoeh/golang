@@ -1,18 +1,28 @@
 package main
 
 import (
-	"encoding"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-func getBlogsHandler(w http.ResponseWriter, r *http.Request) {
-	titles := []map[string]string{
-		{"title": "name ", "content": "Content"},
+func TestGetBlogsEndpoint(t *testing.T) {
+	req, err := http.NewRequest("GET", "/blogs", nil)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(titles)
+	rr := httptest.NewRecorder()
+
+	getBlogsHandler(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("Oops! Something went wrong! Expected status 200, but got %d", rr.Code)
+	}
+
+	expectedResponse := `[{"title": "Blog ", "content": "Content "}]`
+	if rr.Body.String() != expectedResponse {
+		t.Errorf("Oops! Something went wrong! Expected response body %s, but got %s", expectedResponse, rr.Body.String())
+	}
 }
