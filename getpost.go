@@ -4,25 +4,63 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
+// added function with t.Run
+func TestMainHandler(t *testing.T) {
+	t.Run("GetBlogsEndpoint", testGetBlogsEndpoint)
+	t.Run("PostBlogEndpoint", testPostBlogEndpoint)
+}
+
 func TestGetBlogsEndpoint(t *testing.T) {
-	req, err := http.NewRequest("GET", "/blogs", nil)
+	req, err := http.NewRequest("POST", "/blogs", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(getBlogsHandler)
+	handler.ServeHTTP(rr, req)
 
-	getBlogsHandler(rr, req)
-
-	if rr.Code != http.StatusOK {
-		t.Errorf("Oops! Something went wrong! Expected status 200, but got %d", rr.Code)
+	if rr.Code != http.StatusMethodNotAllowed {
+		t.Errorf("Mistake! Expected status 405 Method Not Allowed, but got %d", rr.Code)
 	}
 
-	expectedResponse := `[{"title": "Blog ", "content": "Content "}]`
-	if rr.Body.String() != expectedResponse {
-		t.Errorf("Oops! Something went wrong! Expected response body %s, but got %s", expectedResponse, rr.Body.String())
+	req, err = http.NewRequest("GET", "/nonexistent", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rr = httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusNotFound {
+		t.Errorf("Mistake! Expected status 404 Method Not Allowed, but got %d", rr.Code)
+	}
+}
+
+func TestPostBlogEndpoint(t *testing.T) {
+	payload := map[string]string{
+		"title":   "",
+		"content": "",
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	req, err := http.NewRequest("POST", "/blogs", strings.NewReader(string(body)))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(postBlogHandler)
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusBadRequest {
+		t.Errorf("Mistake! Expected status 400 Method Not Allowed, but got %d", rr.Code)
 	}
 }
