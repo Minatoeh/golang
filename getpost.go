@@ -8,6 +8,12 @@ import (
 	"testing"
 )
 
+// added function with t.Run
+func TestMainHandler(t *testing.T) {
+	t.Run("GetBlogsEndpoint", testGetBlogsEndpoint)
+	t.Run("PostBlogEndpoint", testPostBlogEndpoint)
+}
+
 func TestGetBlogsEndpoint(t *testing.T) {
 	req, err := http.NewRequest("POST", "/blogs", nil)
 	if err != nil {
