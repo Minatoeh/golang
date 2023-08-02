@@ -4,7 +4,7 @@ package main_test
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/Minatoeh/golang"
+	"github.com/Minatoeh/golang/tests"
 	"net/http"
 	"net/http/httptest"
 	"testing"
