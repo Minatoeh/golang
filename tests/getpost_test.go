@@ -1,9 +1,9 @@
 // there we will add file and code to our test-check.
-package test_test
+package tests
 
 import (
 	"encoding/json"
-	"github.com/Minatoeh/golang/blob/Testing/getpost.go"
+	"github.com/Minatoeh/golang.tests"
 	"net/http"
 	"net/http/httptest"
 	"testing"
