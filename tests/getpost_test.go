@@ -1,5 +1,5 @@
 // there we will add file and code to our test-check.
-package tests
+package main_test
 
 import (
 	"encoding/json"

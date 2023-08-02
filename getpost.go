@@ -8,6 +8,43 @@ import (
 	"testing"
 )
 
+//added blog and getblogshander + postbloghandler
+
+type Blog struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
+
+var blogs []Blog
+
+func getBlogsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(blogs)
+}
+
+func postBlogHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var blog Blog
+	err := json.NewDecoder(r.Body).Decode(&blog)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	blogs = append(blogs, blog)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+}
+
 // added t.Run function
 func TestHandler(t *testing.T) {
 	t.Run("GetBlogsEndpoint", testGetBlogsEndpoint)
