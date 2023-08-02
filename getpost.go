@@ -8,8 +8,6 @@ import (
 	"testing"
 )
 
-//added blog and getblogshander + postbloghandler
-
 type Blog struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`

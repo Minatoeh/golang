@@ -2,6 +2,7 @@
 package main_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/Minatoeh/golang"
 	"net/http"
@@ -16,7 +17,7 @@ func TestGetBlogsEndpoint(t *testing.T) {
 	}
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(getBlogsHandler)
+	handler := http.HandlerFunc(main.getBlogsHandler)
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusOK {
@@ -43,7 +44,7 @@ func TestPostBlogEndpoint(t *testing.T) {
 	}
 
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(postBlogHandler)
+	handler := http.HandlerFunc(main.postBlogHandler)
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusCreated {
