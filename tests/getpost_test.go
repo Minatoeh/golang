@@ -3,7 +3,7 @@ package tests
 
 import (
 	"encoding/json"
-	"github.com/Minatoeh/golang.tests"
+	"github.com/Minatoeh/golang"
 	"net/http"
 	"net/http/httptest"
 	"testing"
